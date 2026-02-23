@@ -1,0 +1,42 @@
+2026-01-26 13:31:46 - Action: save_report
+Period Start: 2026-01-01
+Period End: 2026-06-30
+User ID: 1
+Creating report with employee_id=1
+Result: SUCCESS - Report ID: 31
+
+
+2026-01-26 13:32:27 - Action: add_project_with_file
+Report ID: 31
+Project Name: Review of EC's Manual of Approvals (MANAP) <CASURE
+Success Indicators Count: 3
+Accomplishment Count: 3
+After Filter - Success Indicators Count: 3
+After Filter - Accomplishment Count: 3
+Query: INSERT INTO projects_activities (report_id, project_name, success_indicators, actual_accomplishment, quantity, efficiency, timeliness, quality, remarks)
+                     VALUES (31, 'Review of EC...
+Insert: SUCCESS - ID: 0
+File Upload: SUCCESS
+
+
+2026-02-05 08:41:07 - Action: save_report
+Period Start: 2026-02-01
+Period End: 2026-02-28
+User ID: 10
+Creating report with employee_id=10
+Result: SUCCESS - Report ID: 32
+
+
+2026-02-05 08:41:30 - Action: add_project_with_file
+Report ID: 32
+Project Name: Test
+Success Indicators Count: 1
+Accomplishment Count: 1
+After Filter - Success Indicators Count: 1
+After Filter - Accomplishment Count: 1
+Query: INSERT INTO projects_activities (report_id, project_name, success_indicators, actual_accomplishment, quantity, efficiency, timeliness, quality, remarks)
+                     VALUES (32, 'Test', 'test...
+Insert: SUCCESS - ID: 0
+File Upload: SUCCESS
+
+

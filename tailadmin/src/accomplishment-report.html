@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Accomplishment Report Dashboard | TailAdmin</title>
+  </head>
+  <body
+    x-data="{ 
+      page: 'accomplishment', 
+      'loaded': true, 
+      'darkMode': false, 
+      'stickyMenu': false, 
+      'sidebarToggle': false, 
+      'scrollTop': false,
+      showModal: false,
+      editingReport: null,
+      reports: []
+    }"
+    x-init="
+      darkMode = JSON.parse(localStorage.getItem('darkMode'));
+      loadReports();
+      $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
+    :class="{'dark bg-gray-900': darkMode === true}"
+  >
+    <!-- ===== Preloader Start ===== -->
+    <include src="./partials/preloader.html"></include>
+    <!-- ===== Preloader End ===== -->
+
+    <!-- ===== Page Wrapper Start ===== -->
+    <div class="flex h-screen overflow-hidden">
+      <!-- ===== Sidebar Start ===== -->
+      <include src="./partials/sidebar.html"></include>
+      <!-- ===== Sidebar End ===== -->
+
+      <!-- ===== Content Area Start ===== -->
+      <div class="relative flex flex-col flex-1 overflow-x-hidden overflow-y-auto">
+        <!-- Small Device Overlay Start -->
+        <include src="./partials/overlay.html" />
+        <!-- Small Device Overlay End -->
+
+        <!-- ===== Header Start ===== -->
+        <include src="./partials/header.html" />
+        <!-- ===== Header End ===== -->
+
+        <!-- ===== Main Content Start ===== -->
+        <main>
+          <div class="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
+            <!-- Header Section -->
+            <div class="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+              <div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+                  Accomplishment Reports
+                </h1>
+                <p class="mt-1 text-gray-600 dark:text-gray-400">
+                  Individual Performance Commitment and Review (IPCR)
+                </p>
+              </div>
+              <button
+                @click="showModal = true; editingReport = null"
+                class="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
+              >
+                <svg
+                  class="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 4v16m8-8H4"
+                  ></path>
+                </svg>
+                New Report
+              </button>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
+              <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Total Reports</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white" x-text="reports.length"></p>
+                  </div>
+                  <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
+                    <svg class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Completed</p>
+                    <p class="text-2xl font-bold text-green-600 dark:text-green-400" x-text="reports.filter(r => r.status === 'completed').length"></p>
+                  </div>
+                  <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900">
+                    <svg class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">In Progress</p>
+                    <p class="text-2xl font-bold text-yellow-600 dark:text-yellow-400" x-text="reports.filter(r => r.status === 'in-progress').length"></p>
+                  </div>
+                  <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-900">
+                    <svg class="h-6 w-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Pending</p>
+                    <p class="text-2xl font-bold text-red-600 dark:text-red-400" x-text="reports.filter(r => r.status === 'pending').length"></p>
+                  </div>
+                  <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900">
+                    <svg class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Main Table -->
+            <div class="rounded-lg bg-white shadow dark:bg-gray-800">
+              <div class="border-b border-gray-200 p-6 dark:border-gray-700">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">Reports List</h2>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full">
+                  <thead>
+                    <tr class="border-b border-gray-200 dark:border-gray-700">
+                      <th class="bg-gray-50 px-6 py-4 text-left text-sm font-medium text-gray-700 dark:bg-gray-900 dark:text-gray-300">Employee</th>
+                      <th class="bg-gray-50 px-6 py-4 text-left text-sm font-medium text-gray-700 dark:bg-gray-900 dark:text-gray-300">Department</th>
+                      <th class="bg-gray-50 px-6 py-4 text-left text-sm font-medium text-gray-700 dark:bg-gray-900 dark:text-gray-300">Period</th>
+                      <th class="bg-gray-50 px-6 py-4 text-left text-sm font-medium text-gray-700 dark:bg-gray-900 dark:text-gray-300">Status</th>
+                      <th class="bg-gray-50 px-6 py-4 text-left text-sm font-medium text-gray-700 dark:bg-gray-900 dark:text-gray-300">Rating</th>
+                      <th class="bg-gray-50 px-6 py-4 text-center text-sm font-medium text-gray-700 dark:bg-gray-900 dark:text-gray-300">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template x-for="report in reports" :key="report.id">
+                      <tr class="border-b border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700">
+                        <td class="px-6 py-4 text-gray-900 dark:text-white" x-text="report.employeeName"></td>
+                        <td class="px-6 py-4 text-gray-600 dark:text-gray-400" x-text="report.department"></td>
+                        <td class="px-6 py-4 text-gray-600 dark:text-gray-400" x-text="report.period"></td>
+                        <td class="px-6 py-4">
+                          <span
+                            class="inline-flex rounded-full px-3 py-1 text-sm font-medium"
+                            :class="{
+                              'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300': report.status === 'completed',
+                              'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300': report.status === 'in-progress',
+                              'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300': report.status === 'pending'
+                            }"
+                            x-text="report.status"
+                          ></span>
+                        </td>
+                        <td class="px-6 py-4 text-gray-900 dark:text-white">
+                          <div class="flex items-center gap-2">
+                            <div class="h-2 w-24 rounded-full bg-gray-200 dark:bg-gray-700">
+                              <div
+                                class="h-2 rounded-full bg-blue-600 dark:bg-blue-400"
+                                :style="`width: ${report.rating}%`"
+                              ></div>
+                            </div>
+                            <span x-text="`${report.rating}%`"></span>
+                          </div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                          <div class="flex justify-center gap-2">
+                            <button
+                              @click="editingReport = report; showModal = true"
+                              class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                            >
+                              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                              </svg>
+                            </button>
+                            <button
+                              @click="deleteReport(report.id)"
+                              class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                            >
+                              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                              </svg>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+
+                <!-- Empty State -->
+                <template x-if="reports.length === 0">
+                  <div class="flex flex-col items-center justify-center py-12 text-center">
+                    <svg class="h-16 w-16 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">No Reports</h3>
+                    <p class="mt-1 text-gray-600 dark:text-gray-400">Get started by creating your first accomplishment report.</p>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </main>
+        <!-- ===== Main Content End ===== -->
+      </div>
+      <!-- ===== Content Area End ===== -->
+    </div>
+    <!-- ===== Page Wrapper End ===== -->
+
+    <!-- Modal -->
+    <div
+      x-show="showModal"
+      x-transition
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+      @click.self="showModal = false"
+    >
+      <div class="max-h-[90vh] w-full max-w-4xl overflow-auto rounded-lg bg-white p-6 dark:bg-gray-800">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+            <span x-show="!editingReport">New Accomplishment Report</span>
+            <span x-show="editingReport">Edit Report</span>
+          </h2>
+          <button
+            @click="showModal = false"
+            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+          >
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <form @submit.prevent="saveReport" class="space-y-6">
+          <!-- Employee Information -->
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Employee Name</label>
+              <input
+                type="text"
+                x-model="editingReport ? editingReport.employeeName : formData.employeeName"
+                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                required
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Department</label>
+              <input
+                type="text"
+                x-model="editingReport ? editingReport.department : formData.department"
+                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                required
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Period</label>
+              <input
+                type="text"
+                placeholder="e.g., January - June 2025"
+                x-model="editingReport ? editingReport.period : formData.period"
+                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                required
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+              <select
+                x-model="editingReport ? editingReport.status : formData.status"
+                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              >
+                <option value="pending">Pending</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Projects/Activities -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Projects/Activities/Programs</label>
+            <textarea
+              x-model="editingReport ? editingReport.projects : formData.projects"
+              rows="3"
+              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="List all projects, activities, or programs"
+            ></textarea>
+          </div>
+
+          <!-- Success Indicators -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Success Indicators (Target Measures)</label>
+            <textarea
+              x-model="editingReport ? editingReport.successIndicators : formData.successIndicators"
+              rows="3"
+              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="Define success indicators and target measures"
+            ></textarea>
+          </div>
+
+          <!-- Actual Accomplishment -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Actual Accomplishment</label>
+            <textarea
+              x-model="editingReport ? editingReport.actualAccomplishment : formData.actualAccomplishment"
+              rows="3"
+              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="Describe the actual accomplishment achieved"
+            ></textarea>
+          </div>
+
+          <!-- Metrics Grid -->
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Quantity</label>
+              <input
+                type="number"
+                x-model="editingReport ? editingReport.quantity : formData.quantity"
+                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                min="0"
+                max="100"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Efficiency (%)</label>
+              <input
+                type="number"
+                x-model="editingReport ? editingReport.efficiency : formData.efficiency"
+                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                min="0"
+                max="100"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Timeliness (%)</label>
+              <input
+                type="number"
+                x-model="editingReport ? editingReport.timeliness : formData.timeliness"
+                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                min="0"
+                max="100"
+              />
+            </div>
+          </div>
+
+          <!-- Rating -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Overall Rating (%)</label>
+            <input
+              type="number"
+              x-model="editingReport ? editingReport.rating : formData.rating"
+              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              min="0"
+              max="100"
+              required
+            />
+          </div>
+
+          <!-- Remarks -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Remarks</label>
+            <textarea
+              x-model="editingReport ? editingReport.remarks : formData.remarks"
+              rows="2"
+              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="Additional remarks or notes"
+            ></textarea>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="flex gap-4 pt-4">
+            <button
+              type="submit"
+              class="flex-1 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
+            >
+              Save Report
+            </button>
+            <button
+              type="button"
+              @click="showModal = false"
+              class="flex-1 rounded-md bg-gray-200 px-4 py-2 text-gray-900 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      function loadReports() {
+        const stored = localStorage.getItem('accomplishmentReports');
+        if (stored) {
+          this.reports = JSON.parse(stored);
+        } else {
+          // Sample data
+          this.reports = [
+            {
+              id: 1,
+              employeeName: 'Michelle C. Corpuz',
+              department: 'Systems Audit and Quality Assurance',
+              period: 'January - June 2025',
+              status: 'completed',
+              projects: 'Support to Operations (STO), EC\'s data gathering',
+              successIndicators: '5 EC\'s gathered, reviewed and evaluated with 100% accuracy',
+              actualAccomplishment: '5 Reports on Review of Manual of Approvals prepared and finalized within 5 days',
+              quantity: 5,
+              efficiency: 100,
+              timeliness: 100,
+              rating: 95,
+              remarks: 'Excellent performance'
+            },
+            {
+              id: 2,
+              employeeName: 'John D. Santos',
+              department: 'Finance Division',
+              period: 'January - June 2025',
+              status: 'in-progress',
+              projects: 'Budget Planning and Allocation',
+              successIndicators: 'Complete quarterly budget analysis',
+              actualAccomplishment: 'Completed Q1 and Q2 budget analysis',
+              quantity: 2,
+              efficiency: 85,
+              timeliness: 90,
+              rating: 88,
+              remarks: 'On track'
+            }
+          ];
+          saveReports(this.reports);
+        }
+      }
+
+      function saveReport() {
+        if (this.editingReport) {
+          // Update existing
+          const index = this.reports.findIndex(r => r.id === this.editingReport.id);
+          if (index !== -1) {
+            this.reports[index] = this.editingReport;
+          }
+        } else {
+          // Create new
+          const newReport = {
+            id: Date.now(),
+            employeeName: this.formData?.employeeName || '',
+            department: this.formData?.department || '',
+            period: this.formData?.period || '',
+            status: this.formData?.status || 'pending',
+            projects: this.formData?.projects || '',
+            successIndicators: this.formData?.successIndicators || '',
+            actualAccomplishment: this.formData?.actualAccomplishment || '',
+            quantity: parseInt(this.formData?.quantity) || 0,
+            efficiency: parseInt(this.formData?.efficiency) || 0,
+            timeliness: parseInt(this.formData?.timeliness) || 0,
+            rating: parseInt(this.formData?.rating) || 0,
+            remarks: this.formData?.remarks || ''
+          };
+          this.reports.push(newReport);
+        }
+        
+        saveReports(this.reports);
+        this.showModal = false;
+        this.editingReport = null;
+        this.formData = {};
+      }
+
+      function deleteReport(id) {
+        if (confirm('Are you sure you want to delete this report?')) {
+          this.reports = this.reports.filter(r => r.id !== id);
+          saveReports(this.reports);
+        }
+      }
+
+      function saveReports(reports) {
+        localStorage.setItem('accomplishmentReports', JSON.stringify(reports));
+      }
+
+      // Initialize formData
+      window.addEventListener('load', () => {
+        const formDataEl = document.querySelector('[x-data]');
+        if (formDataEl && formDataEl.__x) {
+          formDataEl.__x.$data.formData = {
+            employeeName: '',
+            department: '',
+            period: '',
+            status: 'pending',
+            projects: '',
+            successIndicators: '',
+            actualAccomplishment: '',
+            quantity: 0,
+            efficiency: 0,
+            timeliness: 0,
+            rating: 0,
+            remarks: ''
+          };
+        }
+      });
+    </script>
+  </body>
+</html>

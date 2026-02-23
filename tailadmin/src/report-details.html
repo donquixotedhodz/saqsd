@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Report Details | Accomplishment Dashboard</title>
+  </head>
+  <body
+    x-data="{ 
+      page: 'accomplishment', 
+      'loaded': true, 
+      'darkMode': false, 
+      'stickyMenu': false, 
+      'sidebarToggle': false, 
+      'scrollTop': false,
+      report: null
+    }"
+    x-init="
+      darkMode = JSON.parse(localStorage.getItem('darkMode'));
+      loadReport();
+      $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
+    :class="{'dark bg-gray-900': darkMode === true}"
+  >
+    <!-- ===== Preloader Start ===== -->
+    <include src="./partials/preloader.html"></include>
+    <!-- ===== Preloader End ===== -->
+
+    <!-- ===== Page Wrapper Start ===== -->
+    <div class="flex h-screen overflow-hidden">
+      <!-- ===== Sidebar Start ===== -->
+      <include src="./partials/sidebar.html"></include>
+      <!-- ===== Sidebar End ===== -->
+
+      <!-- ===== Content Area Start ===== -->
+      <div class="relative flex flex-col flex-1 overflow-x-hidden overflow-y-auto">
+        <!-- Small Device Overlay Start -->
+        <include src="./partials/overlay.html" />
+        <!-- Small Device Overlay End -->
+
+        <!-- ===== Header Start ===== -->
+        <include src="./partials/header.html" />
+        <!-- ===== Header End ===== -->
+
+        <!-- ===== Main Content Start ===== -->
+        <main>
+          <div class="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
+            <template x-if="report">
+              <!-- Header -->
+              <div class="mb-6">
+                <button
+                  onclick="window.history.back()"
+                  class="mb-4 inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                  </svg>
+                  Back
+                </button>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+                  IPCR Report Details
+                </h1>
+              </div>
+
+              <!-- Employee Information Card -->
+              <div class="mb-6 rounded-lg bg-white shadow dark:bg-gray-800">
+                <div class="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+                  <h2 class="text-xl font-bold text-gray-900 dark:text-white">Employee Information</h2>
+                </div>
+                <div class="grid grid-cols-1 gap-6 p-6 md:grid-cols-3">
+                  <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Employee Name</p>
+                    <p class="mt-1 text-lg font-semibold text-gray-900 dark:text-white" x-text="report.employeeName"></p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Department</p>
+                    <p class="mt-1 text-lg font-semibold text-gray-900 dark:text-white" x-text="report.department"></p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Reporting Period</p>
+                    <p class="mt-1 text-lg font-semibold text-gray-900 dark:text-white" x-text="report.period"></p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Status and Rating -->
+              <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+                  <p class="text-sm text-gray-600 dark:text-gray-400">Status</p>
+                  <span
+                    class="mt-2 inline-flex rounded-full px-3 py-1 text-sm font-medium"
+                    :class="{
+                      'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300': report.status === 'completed',
+                      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300': report.status === 'in-progress',
+                      'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300': report.status === 'pending'
+                    }"
+                    x-text="report.status"
+                  ></span>
+                </div>
+                <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+                  <p class="text-sm text-gray-600 dark:text-gray-400">Overall Rating</p>
+                  <div class="mt-4">
+                    <div class="flex items-end gap-4">
+                      <div class="flex-1">
+                        <div class="h-3 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+                          <div
+                            class="h-3 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700"
+                            :style="`width: ${report.rating}%`"
+                          ></div>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <p class="text-3xl font-bold text-gray-900 dark:text-white" x-text="`${report.rating}%`"></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Performance Metrics -->
+              <div class="mb-6 rounded-lg bg-white shadow dark:bg-gray-800">
+                <div class="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+                  <h2 class="text-xl font-bold text-gray-900 dark:text-white">Performance Metrics</h2>
+                </div>
+                <div class="grid grid-cols-1 gap-6 p-6 md:grid-cols-3">
+                  <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Quantity</p>
+                    <div class="mt-4">
+                      <p class="text-4xl font-bold text-blue-600 dark:text-blue-400" x-text="report.quantity"></p>
+                      <div class="mt-2 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
+                        <div
+                          class="h-2 rounded-full bg-blue-600 dark:bg-blue-400"
+                          :style="`width: ${Math.min(report.quantity * 10, 100)}%`"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Efficiency</p>
+                    <div class="mt-4">
+                      <p class="text-4xl font-bold text-green-600 dark:text-green-400" x-text="`${report.efficiency}%`"></p>
+                      <div class="mt-2 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
+                        <div
+                          class="h-2 rounded-full bg-green-600 dark:bg-green-400"
+                          :style="`width: ${report.efficiency}%`"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Timeliness</p>
+                    <div class="mt-4">
+                      <p class="text-4xl font-bold text-purple-600 dark:text-purple-400" x-text="`${report.timeliness}%`"></p>
+                      <div class="mt-2 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
+                        <div
+                          class="h-2 rounded-full bg-purple-600 dark:bg-purple-400"
+                          :style="`width: ${report.timeliness}%`"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Projects and Activities -->
+              <div class="mb-6 rounded-lg bg-white shadow dark:bg-gray-800">
+                <div class="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+                  <h2 class="text-xl font-bold text-gray-900 dark:text-white">Projects/Activities/Programs</h2>
+                </div>
+                <div class="border-l-4 border-blue-600 bg-blue-50 p-6 dark:border-blue-400 dark:bg-blue-900/20">
+                  <p class="whitespace-pre-wrap text-gray-900 dark:text-gray-100" x-text="report.projects"></p>
+                </div>
+              </div>
+
+              <!-- Success Indicators -->
+              <div class="mb-6 rounded-lg bg-white shadow dark:bg-gray-800">
+                <div class="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+                  <h2 class="text-xl font-bold text-gray-900 dark:text-white">Success Indicators (Target Measures)</h2>
+                </div>
+                <div class="border-l-4 border-green-600 bg-green-50 p-6 dark:border-green-400 dark:bg-green-900/20">
+                  <p class="whitespace-pre-wrap text-gray-900 dark:text-gray-100" x-text="report.successIndicators"></p>
+                </div>
+              </div>
+
+              <!-- Actual Accomplishment -->
+              <div class="mb-6 rounded-lg bg-white shadow dark:bg-gray-800">
+                <div class="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+                  <h2 class="text-xl font-bold text-gray-900 dark:text-white">Actual Accomplishment</h2>
+                </div>
+                <div class="border-l-4 border-yellow-600 bg-yellow-50 p-6 dark:border-yellow-400 dark:bg-yellow-900/20">
+                  <p class="whitespace-pre-wrap text-gray-900 dark:text-gray-100" x-text="report.actualAccomplishment"></p>
+                </div>
+              </div>
+
+              <!-- Remarks -->
+              <template x-if="report.remarks">
+                <div class="mb-6 rounded-lg bg-white shadow dark:bg-gray-800">
+                  <div class="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">Remarks</h2>
+                  </div>
+                  <div class="border-l-4 border-orange-600 bg-orange-50 p-6 dark:border-orange-400 dark:bg-orange-900/20">
+                    <p class="whitespace-pre-wrap text-gray-900 dark:text-gray-100" x-text="report.remarks"></p>
+                  </div>
+                </div>
+              </template>
+
+              <!-- Actions -->
+              <div class="flex gap-4 pb-6">
+                <button
+                  @click="printReport()"
+                  class="inline-flex items-center gap-2 rounded-md bg-blue-600 px-6 py-3 text-white hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
+                >
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                  </svg>
+                  Print Report
+                </button>
+                <button
+                  @click="downloadPDF()"
+                  class="inline-flex items-center gap-2 rounded-md bg-green-600 px-6 py-3 text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
+                >
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3v-6"></path>
+                  </svg>
+                  Download PDF
+                </button>
+                <button
+                  onclick="window.history.back()"
+                  class="inline-flex items-center gap-2 rounded-md bg-gray-200 px-6 py-3 text-gray-900 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                >
+                  Back
+                </button>
+              </div>
+            </template>
+
+            <!-- Loading State -->
+            <template x-if="!report">
+              <div class="flex items-center justify-center py-12">
+                <div class="text-center">
+                  <svg class="mx-auto h-12 w-12 animate-spin text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9m-5 5v.01M9 19l3 3m0 0l3-3m-3 3v-6"></path>
+                  </svg>
+                  <p class="mt-4 text-gray-600 dark:text-gray-400">Loading report...</p>
+                </div>
+              </div>
+            </template>
+          </div>
+        </main>
+        <!-- ===== Main Content End ===== -->
+      </div>
+      <!-- ===== Content Area End ===== -->
+    </div>
+    <!-- ===== Page Wrapper End ===== -->
+
+    <script>
+      function loadReport() {
+        const reportId = new URLSearchParams(window.location.search).get('id');
+        const stored = localStorage.getItem('accomplishmentReports');
+        
+        if (stored && reportId) {
+          const reports = JSON.parse(stored);
+          this.report = reports.find(r => r.id == reportId);
+        }
+      }
+
+      function printReport() {
+        window.print();
+      }
+
+      function downloadPDF() {
+        const element = document.querySelector('main');
+        const opt = {
+          margin: 10,
+          filename: `accomplishment-report-${this.report.employeeName.replace(/\s+/g, '-')}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+        };
+        
+        if (typeof html2pdf !== 'undefined') {
+          html2pdf().set(opt).from(element).save();
+        } else {
+          alert('PDF download functionality requires html2pdf library to be loaded.');
+          printReport();
+        }
+      }
+
+      // Add print styles
+      const style = document.createElement('style');
+      style.textContent = `
+        @media print {
+          body {
+            background: white;
+          }
+          .dark {
+            color-scheme: light;
+          }
+          svg[class*='h-5'] {
+            display: none;
+          }
+          button {
+            display: none;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    </script>
+  </body>
+</html>
