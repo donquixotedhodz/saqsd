@@ -19,7 +19,8 @@
     --radius-md: 0.5rem;
     --radius-lg: 0.75rem;
     --radius-xl: 1rem;
-    --transition-all: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+    --transition-standard: opacity 0.3s ease, transform 0.3s ease, background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Base resets & typography */
@@ -56,7 +57,7 @@ body {
     box-shadow: var(--shadow-card) !important;
     border: 1px solid rgba(255, 255, 255, 0.5) !important;
     padding: 1.75rem !important;
-    transition: var(--transition-all) !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     position: relative;
     overflow: hidden;
 }
@@ -128,7 +129,7 @@ div {
     align-items: center;
     justify-content: center;
     border-radius: 10px;
-    transition: var(--transition-all);
+    transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
     border: 1px solid transparent;
 }
@@ -213,7 +214,7 @@ textarea {
     border-radius: var(--radius-md) !important;
     font-size: 0.875rem !important;
     background-color: var(--color-surface) !important;
-    transition: var(--transition-all) !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
 .form-control:focus,
@@ -225,22 +226,22 @@ textarea:focus {
     box-shadow: 0 0 0 3px var(--color-primary-light) !important;
 }
 
-/* Modals with Hardware Acceleration */
+/* Modals with Zero-Lag Performance */
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background-color: rgba(15, 23, 42, 0.4);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background-color: rgba(15, 23, 42, 0.75);
+    /* Darker solid background for premium feel without blur lag */
     z-index: 999;
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s;
+    transition: opacity 0.25s linear, visibility 0.25s;
+    /* Faster, simpler transition */
     padding: 1.5rem;
-    will-change: opacity, visibility;
+    will-change: opacity;
 }
 
 .modal-overlay.active {
@@ -253,11 +254,12 @@ textarea:focus {
     width: 100%;
     max-width: 500px;
     border-radius: 1.25rem;
-    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35);
     border: 1px solid rgba(226, 232, 240, 0.8);
-    transform: translateY(15px) scale(0.97);
+    transform: translate3d(0, 15px, 0);
+    /* 3D transform for GPU acceleration */
     opacity: 0;
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
     overflow: hidden;
     position: relative;
     display: flex;
@@ -266,7 +268,7 @@ textarea:focus {
 }
 
 .modal-overlay.active .modal-content {
-    transform: translateY(0) scale(1);
+    transform: translate3d(0, 0, 0);
     opacity: 1;
 }
 
@@ -347,7 +349,7 @@ textarea:focus {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    transition: var(--transition-all) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
 }
 
 .stat-card:hover {
@@ -402,7 +404,7 @@ table.w-full td {
 
 /* Sidebar navigation */
 nav a {
-    transition: var(--transition-all) !important;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease !important;
     border-left: 4px solid transparent !important;
     font-size: 1rem !important;
     padding-top: 1rem !important;
